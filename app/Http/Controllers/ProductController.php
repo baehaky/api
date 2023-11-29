@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use File;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -21,7 +23,7 @@ class ProductController extends Controller
         $product->Harga = $request->input('Harga');
         $product->amount = $request->input('amount');
         $product->save();
-        return response()->json(['success' => true,'data' => $product]);
+        return response()->json(['success' => true, 'message' => 'berhasil', 'data' => $product]);
     }
 
     function listProduct()
@@ -31,9 +33,15 @@ class ProductController extends Controller
 
     function deleteProduct($id)
     {
-        $result = Product::where('productID', $id)->delete();
-        if ($result) {
-            return response()->json(['success' => true, 'message' => 'data hasbeen deleted', 'data' => $result]);
+        $transaksi = DB::table('transactions')
+                            ->where('productID', $id)
+                            ->delete();
+        $product = DB::table('products')
+                            ->where('productID', $id)
+                            ->delete();
+
+        if ($product) {
+            return response()->json(['success' => true, 'message' => 'data hasbeen deleted', 'data' => $product]);
         }
     }
 
@@ -43,44 +51,48 @@ class ProductController extends Controller
         return $product;
     }
 
-    function updateProduct(Request $request)
+    function updateProduct($id, Request $request)
     {
-        try {
-            $product = Product::where('productID', $request)->get();
-            $product->productName = $request->input('productName');
-            // $product->imageProduct = $request->file('imageProduct')->store('products');
-            // $product->detailProduct = $request->input('detailProduct');
-            // $product->rasaProduct = $request->input('rasaProduct');
-            // $product->rating = $request->input('rating');
-            // $product->harga = $request->input('harga');
-            $product->save();
-
-            // $product->fill($request->post())->update();
-
-            // if($request->hasFile('imageProduct')){
-
-            //     // remove old image
-            //     if($product->imageProduct){
-            //         $exists = Storage::disk('public')->exists("product/{$product->imageProduct}");
-            //         if($exists){
-            //             Storage::disk('public')->delete("product/image/{$product->imageProduct}");
-            //         }
-            //     }
-
-            //     $imageName = Str::random().'.'.$request->imageProduct->getClientOriginalExtension();
-            //     Storage::disk('public')->put('product/', $request->imageProduct,$imageName);
-            //     $product->imageProduct = $imageName;
-            //     $product->save();
-            // }
-
-            return response()->json([
-                'message' => 'Product Updated Successfully!!'
-            ]);
-        } catch (\Exception $e) { {
+        $productName = $request->input('productName');
+        $ProductDeskripsi = $request->input('ProductDeskripsi');
+        $ProductRasa = $request->input('ProductRasa');
+        $Harga = $request->input('Harga');
+        $id_product = DB::table('products')->where('productID', $id)->first();
+        if ($id_product) {
+            try {
+                $product = DB::table('products')
+                    ->where('productID', $id)
+                    ->update(
+                        ['productName' => $productName],
+                        ['ProductDeskripsi' => $ProductDeskripsi],
+                        ['ProductRasa' => $ProductRasa],
+                        ['Harga' => $Harga]
+                    );
                 return response()->json([
-                    'message' => 'Something goes wrong while updating a product!!'
+                    'message' => 'Product Updated Successfully!!',
+                    'data' => $product
+                ]);
+            }
+
+            // if ($product) {
+            //     $productName = $request->input('productName');
+
+            //     try {
+            //         $product->update(['productName' => $productName]);
+            // return response()->json([
+            //     'message' => 'Product Updated Successfully!!'
+            // ]);
+            //     } 
+            catch (\Exception $e) {
+                return response()->json([
+                    'message' => $e->getMessage()
                 ], 500);
             }
+        } else {
+            return response()->json([
+                'message' => 'Product not found.'
+            ], 404);
         }
+        // }
     }
 }

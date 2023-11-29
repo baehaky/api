@@ -23,25 +23,28 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 // Admin routes
-Route::get('adminList',[Admin::class,'adminList']);
+Route::get('adminList', [Admin::class, 'adminList']);
 
 // Transaction routes
-Route::post('insertTransaction',[Transaction::class,'insertTransaction']);
-Route::get('listTransaction',[Transaction::class,'listTransaction']);
-Route::get('listTransaction/{CustomerID}',[Transaction::class,'listTransaction']);
-Route::delete('deleteTransaction',[Transaction::class,'deleteTransaction']);
-Route::post('updateTransaction/{TransactionID}', [Transaction::class,'updateTransaction']);
-Route::get('incomeTransaction', [Transaction::class,'incomeTransaction']);
-Route::get('notificationTransaction', [Transaction::class,'notificationTransaction']);
+Route::post('insertTransaction', [Transaction::class, 'insertTransaction']);
+Route::get('listTransaction', [Transaction::class, 'listTransaction']);
+Route::get('listTransaction/{CustomerID}', [Transaction::class, 'listTransaction']);
+Route::get('historyTransaksi/{CustomerID}', [Transaction::class, 'historyTransaksi']);
+Route::delete('deleteTransaction', [Transaction::class, 'deleteTransaction']);
+Route::post('updateTransaction/{TransactionID}', [Transaction::class, 'updateTransaction']);
+Route::get('incomeTransaction', [Transaction::class, 'incomeTransaction']);
+Route::get('notificationTransaction', [Transaction::class, 'notificationTransaction']);
+Route::get('total', [Transaction::class, 'total']);
 
 // Product routes
-Route::get('listProduct',[Product::class,'listProduct']);
-Route::get('getProduct/{productID}',[Product::class,'getProduct']);
-Route::post('insertProduct',[Product::class,'insertProduct']);
-Route::delete('deleteProduct/{productID}',[Product::class,'deleteProduct']);
+Route::get('listProduct', [Product::class, 'listProduct']);
+Route::get('getProduct/{productID}', [Product::class, 'getProduct']);
+Route::post('updateProduct/{productID}', [Product::class, 'updateProduct']);
+Route::post('insertProduct', [Product::class, 'insertProduct']);
+Route::delete('deleteProduct/{productID}', [Product::class, 'deleteProduct']);
 
 // Auth routes
-Route::post('authenticated',[Authenticator::class, 'authenticated']);
+Route::post('authenticated', [Authenticator::class, 'authenticated']);
 
 // Customer routes
-Route::post('CustomerRegister', [Customer::class,'CustomerRegister']);
+Route::post('CustomerRegister', [Customer::class, 'CustomerRegister']);

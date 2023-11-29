@@ -30,6 +30,7 @@ class TransactionController extends Controller
             ->join('products', 'products.productID', '=', 'transactions.productID')
             ->where('transactions.CustomerID', $id)
             ->where('transactions.Status', "Pending")
+            ->orWhere('transactions.Status', "Disiapkan")
             ->get();
         return $transaksi;
     }
@@ -72,6 +73,23 @@ class TransactionController extends Controller
                 'Status' => $status,
                 'TanggalSampai' => $TanggalSampai
             ]);
-            return response()->json(['success' => "true", 'message' => 'data hasbeen Update', 'data' => $transaksi]);
+        return response()->json(['success' => "true", 'message' => 'data hasbeen Update', 'data' => $transaksi]);
+    }
+
+    function total()
+    {
+        $transaksi = DB::table('transactions')->select(DB::raw('SUM(transactions.Qty * products.Harga) as Total_Penjualan'))->join('products', 'products.productID', '=', 'transactions.productID')->get();
+        return $transaksi;
+    }
+
+    function historyTransaksi($id)
+    {
+        $transaksi = DB::table('transactions')
+            ->select('transactions.TanggalPesan as Tanggal_Pesan', 'transactions.TanggalSampai','products.productName as Nama_Produk', 'transactions.Qty as Jumlah_Produk', DB::raw('(transactions.Qty * products.Harga) as Pembayaran'), 'transactions.Status as Status_Pengiriman')
+            ->join('products', 'products.productID', '=', 'transactions.productID')
+            ->where('transactions.CustomerID', $id)
+            ->where('transactions.Status', "Sampai")
+            ->get();
+        return $transaksi;
     }
 }
